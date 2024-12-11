@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invisalign Profit Calculator</title>
+  <title>Invisalign Profitability Calculator</title>
   <style>
+    /* Import Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Editors+Note&display=swap');
+
+    /* Global Styles */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 20px;
       max-width: 500px;
       margin: auto;
       line-height: 1.6;
-      background-color: #f9f9f9;
-      color: #333;
+      background-color: #fdfdee;
+      color: #515a73;
     }
+
     .calculator {
       background: #fff;
       border: 1px solid #ddd;
@@ -22,17 +27,35 @@
       padding: 20px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
     .calculator h2 {
       margin-top: 0;
       text-align: center;
-      color: #007BFF;
+      color: #f85a11;
+      font-family: 'Inter', sans-serif;
     }
+
+    .calculator h2 .editor-font {
+      font-family: 'Editor's Note', cursive;
+      font-style: italic;
+    }
+
+    .subhead {
+      text-align: center;
+      font-size: 16px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+      color: #515a73;
+      font-weight: 600;
+    }
+
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: bold;
     }
-    input {
+
+    input, output {
       width: 100%;
       padding: 10px;
       margin-bottom: 16px;
@@ -40,22 +63,83 @@
       border-radius: 4px;
       box-sizing: border-box;
     }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .slider-label {
+      font-weight: normal;
+      margin-right: 10px;
+    }
+
+    /* Slider Styles */
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #ccc;
+      border-radius: 5px;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    .slider:hover {
+      background: #d1d1d1;
+    }
+
+    .slider::-webkit-slider-runnable-track {
+      background: linear-gradient(to right, #515a73 0%, #ccc 100%);
+      height: 6px;
+      border-radius: 5px;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background-color: #515a73; /* Slider thumb color */
+      border-radius: 50%;
+      cursor: pointer;
+      margin-top: -7px; /* Centers the thumb on the track */
+      transition: background-color 0.3s;
+    }
+
+    .slider::-moz-range-track {
+      background: #ccc;
+      border-radius: 5px;
+      height: 6px;
+    }
+
+    .slider::-moz-range-progress {
+      background: #515a73;
+      height: 6px;
+      border-radius: 5px;
+    }
+
     button {
       width: 100%;
       padding: 12px;
-      background-color: #007BFF;
+      background-color: #f85a11;
       color: white;
       border: none;
       border-radius: 4px;
       font-size: 16px;
       cursor: pointer;
     }
+
     button:hover {
-      background-color: #0056b3;
+      background-color: #e44f0f;
     }
+
     .output {
       margin-top: 20px;
     }
+
     .comparison {
       display: flex;
       justify-content: space-between;
@@ -65,6 +149,7 @@
       border: 1px solid #ddd;
       border-radius: 4px;
     }
+
     .comparison div {
       width: 48%;
       padding: 10px;
@@ -73,22 +158,32 @@
       border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     .highlight {
-      color: green;
+      color: #515a73; /* Dark text for most GP-Led Invisalign values */
       font-weight: bold;
     }
+
+    .highlight-orange {
+      color: #f85a11; /* Orange text for Two Front values */
+      font-weight: bold;
+    }
+
     .highlight-red {
-      color: red;
+      color: red; /* Red text for GP-Led Invisalign critical values */
       font-weight: bold;
     }
+
     .comparison h3 {
       margin-top: 0;
       font-size: 18px;
-      color: #007BFF;
+      color: #515a73;
+      font-family: 'Inter', sans-serif;
     }
+
     hr {
       border: none;
-      border-top: 1px solid black;
+      border-top: 1px solid #ddd;
       margin: 6px 0;
     }
   </style>
@@ -96,7 +191,8 @@
 <body>
 
 <div class="calculator">
-  <h2>Invisalign Profit Calculator</h2>
+  <h2>Invisalign Profitability <span class="editor-font">Calculator</span></h2>
+  <p class="subhead">Most GPs 5x their PPV with Two Front.</p>
 
   <label for="charge">What you charge for Invisalign ($):</label>
   <input type="number" id="charge" placeholder="Enter amount" required>
@@ -108,7 +204,11 @@
   <input type="number" id="additionalCosts" placeholder="Enter amount" required>
 
   <label for="chairtime">Estimated Chairtime Hours:</label>
-  <input type="number" id="chairtime" placeholder="Enter number of hours" required>
+  <div class="slider-container">
+    <span class="slider-label">10 Hrs</span>
+    <input type="range" id="chairtime" class="slider" min="10" max="20" value="15" step="1" oninput="updateSliderFill()">
+    <span id="chairtime-value" class="slider-label">15 Hrs</span>
+  </div>
 
   <button onclick="calculateProfit()">Calculate</button>
 
@@ -116,63 +216,74 @@
 </div>
 
 <script>
+  function formatNumberWithCommas(number) {
+    const isNegative = number < 0;
+    const absoluteValue = Math.abs(number).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return isNegative ? `- $${absoluteValue}` : `$${absoluteValue}`;
+  }
+
+  function updateSliderFill() {
+    const slider = document.getElementById('chairtime');
+    const valueDisplay = document.getElementById('chairtime-value');
+    const percentage = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+    valueDisplay.textContent = `${slider.value} Hrs`;
+    slider.style.background = `linear-gradient(to right, #515a73 ${percentage}%, #ccc ${percentage}%)`;
+  }
+
   function calculateProfit() {
-    // Get input values
     const charge = parseFloat(document.getElementById('charge').value);
     const labBill = parseFloat(document.getElementById('labBill').value);
     const additionalCosts = parseFloat(document.getElementById('additionalCosts').value);
     const chairtime = parseFloat(document.getElementById('chairtime').value);
 
-    // Validate inputs
-    if (isNaN(charge) || isNaN(labBill) || isNaN(additionalCosts) || isNaN(chairtime) || chairtime <= 0) {
+    if (isNaN(charge) || isNaN(labBill) || isNaN(additionalCosts) || isNaN(chairtime)) {
       document.getElementById('output').innerHTML = "Please enter valid numbers for all fields.";
       return;
     }
 
-    // Calculations for "GP-Led Invisalign"
     const perceivedProfit = charge - labBill - additionalCosts;
     const profitPerHour = perceivedProfit / chairtime;
-    const opportunityCost = chairtime * 500; // $500 per chairtime hour
-    const totalOpportunity = perceivedProfit - opportunityCost; // Always negative
+    const productionLost = chairtime * 500; 
+    const totalOpportunity = perceivedProfit - productionLost;
 
-    // Calculations for "Two Front"
-    const yourPerceivedProfit = 1600; // Fixed profit
-    const yourChairtime = 1.5; // Fixed chairtime
-    const timeSaved = chairtime - yourChairtime; // Time saved by using Two Front
-    const opportunityUnlocked = timeSaved * 500; // Production value of saved chairtime hours
-    const yourProfitPerHour = yourPerceivedProfit / yourChairtime; // Fixed profit per chairtime hour
-    const yourTotalOpportunity = yourPerceivedProfit + opportunityUnlocked; // Total opportunity with Two Front
+    const yourPerceivedProfit = 1600; 
+    const yourChairtime = 1.5; 
+    const timeSaved = chairtime - yourChairtime;
+    const opportunityUnlocked = timeSaved * 500; 
+    const yourProfitPerHour = yourPerceivedProfit / yourChairtime;
+    const yourTotalOpportunity = yourPerceivedProfit + opportunityUnlocked;
 
-    // Display results in a side-by-side comparison
     document.getElementById('output').innerHTML = `
       <div class="comparison">
         <div>
           <h3>GP-Led Invisalign</h3>
-          <p>Perceived Profit Per Case: <span>$${perceivedProfit.toFixed(2)}</span></p>
+          <p>Perceived Profit Per Case: <span class="highlight">${formatNumberWithCommas(perceivedProfit)}</span></p>
           <hr>
-          <p>Chairtime Spent: <span class="highlight-red">${chairtime.toFixed(1)} Hrs</span></p>
+          <p>Chairtime Spent: <span class="highlight">${chairtime.toFixed(1)} Hrs</span></p>
           <hr>
-          <p>Profit per Chairtime Hour: <span class="highlight-red">$${profitPerHour.toFixed(2)}</span></p>
+          <p>Profit per Chairtime Hour: <span class="highlight-red">${formatNumberWithCommas(profitPerHour)}</span></p>
           <hr>
-          <p>Opportunity Cost to Chairtime: <span class="highlight-red">-$${opportunityCost.toFixed(2)}</span></p>
+          <p>Estimated production lost from ${chairtime.toFixed(1)} chairtime hours: <span class="highlight-red">- ${formatNumberWithCommas(productionLost)}</span></p>
           <hr>
-          <p>Earnings Potential Per Case: <span class="highlight-red">$${totalOpportunity.toFixed(2)}</span></p>
+          <p>Earnings Potential Per Case: <span class="highlight-red">${formatNumberWithCommas(totalOpportunity)}</span></p>
         </div>
         <div>
           <h3>Two Front</h3>
-          <p>Perceived Profit Per Case: <span>$${yourPerceivedProfit.toFixed(2)}</span></p>
+          <p>Perceived Profit Per Case: <span class="highlight-orange">${formatNumberWithCommas(yourPerceivedProfit)}</span></p>
           <hr>
-          <p>Chairtime Spent: <span class="highlight">${yourChairtime.toFixed(1)} Hrs</span></p>
+          <p>Chairtime Spent: <span class="highlight-orange">${yourChairtime.toFixed(1)} Hrs</span></p>
           <hr>
-          <p>Profit per Chairtime Hour: <span class="highlight">$${yourProfitPerHour.toFixed(2)}</span></p>
+          <p>Profit per Chairtime Hour: <span class="highlight-orange">${formatNumberWithCommas(yourProfitPerHour)}</span></p>
           <hr>
-          <p>Production value of ${timeSaved.toFixed(1)} chairtime hours: <span class="highlight">$${opportunityUnlocked.toFixed(2)}</span></p>
+          <p>Estimated production value of ${timeSaved.toFixed(1)} chairtime hours: <span class="highlight-orange">${formatNumberWithCommas(opportunityUnlocked)}</span></p>
           <hr>
-          <p>Earnings Potential Per Case: <span class="highlight">$${yourTotalOpportunity.toFixed(2)}</span></p>
+          <p>Earnings Potential Per Case: <span class="highlight-orange">${formatNumberWithCommas(yourTotalOpportunity)}</span></p>
         </div>
       </div>
     `;
   }
+
+  window.onload = updateSliderFill;
 </script>
 
 </body>
